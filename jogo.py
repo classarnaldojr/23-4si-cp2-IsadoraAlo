@@ -25,13 +25,16 @@ while rval:
 
 
 
+
+    cv2.imshow("checkpoint", frame)
+
     #Leitura do vídeo, frame a frame.
     rval, frame = video.read()
     #Caso a tecla ESC for pressionada, o vídeo para. 
     key = cv2.waitKey(20)
     if key == 27: # exit on ESC
         break
-    
+
 #Destroí a janela criada e para de executar o vídeo.
 cv2.destroyWindow("checkpoint")
 video.release()
