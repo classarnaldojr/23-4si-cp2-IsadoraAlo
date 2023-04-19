@@ -10,6 +10,18 @@ def imagem_video_hsv(img):
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     return hsv
 
+#identifica a imagem de pedra, e imprime o texto na tela
+def pedra(img):
+    abluble
+
+#identifica a imagem de papel, e imprime o texto na tela
+def papel(img):
+    abluble
+
+#identifica a imagem de tesoura, e imprime o texto na tela
+def tesoura(img):
+    abluble
+
 #Cria uma janela onde o vídeo irá rodar.
 cv2.namedWindow("checkpoint")
 video = cv2.VideoCapture("video.mp4")
