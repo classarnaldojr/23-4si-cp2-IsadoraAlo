@@ -10,13 +10,16 @@ def imagem_video_gray(img):
 
 #identifica a imagem de movimento, e imprime o texto na tela
 def identifica_movimento(img, ref, texto):
+    #Identifica o caminho do movimento
+    movimentoPath = cv2.data.haarcascades + ref
+
     #Classificador do movimento
-    movimentoCascade = cv2.CascadeClassifier(str(ref))
+    movimentoCascade = cv2.CascadeClassifier(movimentoPath) 
 
     #detecta o movimento na imagem
-    movimento = movimentoCascade.detectMultiScale(img, minNeighbors=20, minSize=(30, 30), maxSize=(500,500))
+    movimento = movimentoCascade.detectMultiScale(img, scaleFactor = 1.2, minNeighbors = 5)
 
-    # Desenha um retangulo nos movimentos detectados
+    # Desenha um retangulo nos movimentos detectados, e imprime o texto correspondente ao movimento da tela
     for (x, y, w, h) in movimento:
         cv2.rectangle(img, (x, y), (x+w, y+h), roxinho, 4)
         cv2.putText(img, str(texto), (x, y+50), cv2.FONT_HERSHEY_SIMPLEX, 1, roxinho, 2, cv2.LINE_AA)
@@ -34,26 +37,25 @@ else:
     rval = False
 
 while rval:
-
     #Pega o frame atual e o transforma em tom de cinza.
     gray = imagem_video_gray(frame)
 
     #Identifica o movimento pedra
-    identifica_movimento(gray,'imagens/pedra.png','Pedra')
+    identifica_movimento(gray, "pedra.png",'Pedra')
+
+    #Identifica o movimento papel
+    identifica_movimento(gray, "papel.png",'Papel')
     
     #Identifica o movimento tesoura
-    identifica_movimento(gray,'imagens/tesoura.png','Tesoura')
-    
-    #Identifica o movimento papel
-    identifica_movimento(gray,'imagens/papel.png','Papel')
+    identifica_movimento(gray, "tesoura.png",'Tesoura')    
 
     #Exibe a imagem scriptada.
-    cv2.imshow("checkpoint", gray)
+    cv2.imshow("checkpoint", frame)
 
     #Leitura do vídeo, frame a frame.
     rval, frame = video.read()
     
-
+    #Aguarda o pressionamento da tecla.
     key = cv2.waitKey(20)
 
     #Caso a tecla ESC for pressionada, o vídeo para. 
