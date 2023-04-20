@@ -1,30 +1,30 @@
 import cv2
 
-#converte a imagem para RGB.
-def imagem_video_rgb(img):
-    rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    return rgb
+# cor padrão para desenhos e textos.
+roxinho = (115, 50, 168)
 
-#converte a imagem para HSV.
-def imagem_video_hsv(img):
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    return hsv
+#converte a imagem para cinza.
+def imagem_video_gray(img):
+    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    return gray
 
-#identifica a imagem de pedra, e imprime o texto na tela
-def pedra(img):
-    abluble
+#identifica a imagem de movimento, e imprime o texto na tela
+def identifica_movimento(img, ref, texto):
+    #Classificador do movimento
+    movimentoCascade = cv2.CascadeClassifier(str(ref))
 
-#identifica a imagem de papel, e imprime o texto na tela
-def papel(img):
-    abluble
+    #detecta o movimento na imagem
+    movimento = movimentoCascade.detectMultiScale(img, minNeighbors=20, minSize=(30, 30), maxSize=(500,500))
 
-#identifica a imagem de tesoura, e imprime o texto na tela
-def tesoura(img):
-    abluble
+    # Desenha um retangulo nos movimentos detectados
+    for (x, y, w, h) in movimento:
+        cv2.rectangle(img, (x, y), (x+w, y+h), roxinho, 4)
+        cv2.putText(img, str(texto), (x, y+50), cv2.FONT_HERSHEY_SIMPLEX, 1, roxinho, 2, cv2.LINE_AA)
+    return movimento
 
 #Cria uma janela onde o vídeo irá rodar.
 cv2.namedWindow("checkpoint")
-video = cv2.VideoCapture("video.mp4")
+video = cv2.VideoCapture("pedra-papel-tesoura.mp4")
 
 #Se o vídeo estiver rodando, ele continua exacutando o script
 if video.isOpened(): 
@@ -35,16 +35,29 @@ else:
 
 while rval:
 
+    #Pega o frame atual e o transforma em tom de cinza.
+    gray = imagem_video_gray(frame)
 
+    #Identifica o movimento pedra
+    identifica_movimento(gray,'imagens/pedra.png','Pedra')
+    
+    #Identifica o movimento tesoura
+    identifica_movimento(gray,'imagens/tesoura.png','Tesoura')
+    
+    #Identifica o movimento papel
+    identifica_movimento(gray,'imagens/papel.png','Papel')
 
-
-    cv2.imshow("checkpoint", frame)
+    #Exibe a imagem scriptada.
+    cv2.imshow("checkpoint", gray)
 
     #Leitura do vídeo, frame a frame.
     rval, frame = video.read()
-    #Caso a tecla ESC for pressionada, o vídeo para. 
+    
+
     key = cv2.waitKey(20)
-    if key == 27: # exit on ESC
+
+    #Caso a tecla ESC for pressionada, o vídeo para. 
+    if key == 27:
         break
 
 #Destroí a janela criada e para de executar o vídeo.
