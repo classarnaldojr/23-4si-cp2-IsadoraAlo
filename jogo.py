@@ -4,12 +4,12 @@ import numpy as np
 #Cor padrão para desenhos e textos.
 roxinho = (115, 50, 168)
 
-#Converte a imagem para RGB
-def imagem_video_rgb(img):
-    return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+placar = [0, 0]
+
+frame_por_segundo = 0
 
 #Converte a imagem para HSV
-def imagem_video_hsv(img):
+def imagem_para_hsv(img):
     return cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
 #Acha o range de cores das mãos
@@ -47,11 +47,7 @@ def exibe_texto(txt, y):
 
 #Calcula o centro de massa do objeto.
 def centro_do_objeto(contorno):
-    M = cv2.moments(contorno)
-    cx = int(M['m10']/M['m00'])
-    cy = int(M['m01']/M['m00'])
-    
-    return cx + cy
+    return int(cv2.moments(contorno)['m10']/cv2.moments(contorno)['m00']) + int(cv2.moments(contorno)['m01']/cv2.moments(contorno)['m00'])
 
 #Identifica a posição do jogador
 def identifica_jogador(contornos):
@@ -82,62 +78,61 @@ def identifica_vitoria(movimento_1, movimento_2):
             return 'Jogador 1 ganhou!'
         else:
             return 'Jogador 2 ganhou!'
+        
+def calcula_placar(resultado):
+    if(frame_por_segundo % 85 == 0):  
+        if(resultado == 'Jogador 1 ganhou!'):
+            placar[0] += 1
+        if(resultado == 'Jogador 2 ganhou!'):
+            placar[1] += 1
 
-#Cria uma janela onde o vídeo irá rodar.
 cv2.namedWindow("checkpoint")
 video = cv2.VideoCapture("pedra-papel-tesoura.mp4")
 
-#Se o vídeo estiver rodando, ele lê o vídeo
 if video.isOpened(): 
     rval, frame = video.read()
-#Se o vídeo não estiver rodando, o script para
 else:
     rval = False
-#Enquanto o vídeo estiver rodando, ele continua exacutando o script
 while rval:
+    frame_por_segundo += 1
 
-    #Converte a imagem para RGB
-    rgb = imagem_video_rgb(frame)
-    #Converte a imagem para HSV
-    hsv = imagem_video_hsv(frame)
+    hsv = imagem_para_hsv(frame)
 
     #Acha o contorno das mãos
     contornos = acha_contorno(hsv)
     #Desenha o contorno das mãos
-    desenho_contornos = desenha_contorno(rgb, contornos)
+    desenho_contornos = desenha_contorno(frame, contornos)
 
     #Identifica a posição dos jogadores na tela
     jogador1, jogador2 = identifica_jogador(contornos)
 
-    #Calcula a area de contorno do primeiro jogador
+    #Calcula a area de contorno dos jogadores
     area_1 = acha_area_contorno(jogador1)
-    #Calcula a area de contorno do segundo jogador
     area_2 = acha_area_contorno(jogador2)
 
-    #Identifica o movimento do primeiro jogador
+    #Identifica o movimento dos jogadores
     movimento_1 = identifica_movimento(area_1)
-    #Identifica o movimento do segundo jogador
     movimento_2 = identifica_movimento(area_2)
 
     resultado = identifica_vitoria(movimento_1,movimento_2)
+    
+    calcula_placar(resultado)
 
     #Imprime os movimentos realizado na tela
     ala = exibe_texto(movimento_1+' x '+movimento_2, 50)
+    #Imprime na tela o placar
+    ala = exibe_texto(str(placar), 100)
     #Imprime o resultado da partida na tela
-    ala = exibe_texto(resultado, 150)
+    ala = exibe_texto(resultado, 150) 
+
     #Exibe a imagem scriptada.
     cv2.imshow("checkpoint", ala)
 
-    #Leitura do vídeo, frame a frame.
     rval, frame = video.read()
-    
-    #Aguarda o pressionamento da tecla.
     key = cv2.waitKey(20)
 
     #Caso a tecla ESC for pressionada, o vídeo para. 
     if key == 27:
         break
-
-#Destroí a janela criada e para de executar o vídeo.
 cv2.destroyWindow("checkpoint")
 video.release()
