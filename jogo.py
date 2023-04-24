@@ -42,8 +42,8 @@ def identifica_movimento(area):
         return 'Tesoura'
 
 #Imprime na tela um texto
-def exibe_texto(txt):
-    return cv2.putText(desenho_contornos, str(txt),(50,50), cv2.FONT_HERSHEY_SIMPLEX,1, roxinho,2,cv2.LINE_AA)
+def exibe_texto(txt, y):
+    return cv2.putText(desenho_contornos, str(txt),(50,y), cv2.FONT_HERSHEY_SIMPLEX,1, roxinho,2,cv2.LINE_AA)
 
 #Calcula o centro de massa do objeto.
 def centro_do_objeto(contorno):
@@ -64,19 +64,36 @@ def identifica_jogador(contornos):
     return jogador1, jogador2
 
 #Identifica o jogador ganhador
-#def identifica_vitoria:
+def identifica_vitoria(movimento_1, movimento_2):
+    if(movimento_1 == movimento_2):
+        return 'Empate'
+    elif(movimento_1 == 'Pedra'):
+        if movimento_2 == "Tesoura":
+            return 'Jogador 1 ganhou!'
+        else:
+            return 'Jogador 2 ganhou!'
+    elif(movimento_1 == 'Papel'):
+        if movimento_2 == "Pedra":
+            return 'Jogador 1 ganhou!'
+        else:
+            return 'Jogador 2 ganhou!'
+    elif(movimento_1 == 'Tesoura'):
+        if movimento_2 == "Papel":
+            return 'Jogador 1 ganhou!'
+        else:
+            return 'Jogador 2 ganhou!'
 
 #Cria uma janela onde o vídeo irá rodar.
 cv2.namedWindow("checkpoint")
 video = cv2.VideoCapture("pedra-papel-tesoura.mp4")
 
-#Se o vídeo estiver rodando, ele continua exacutando o script
+#Se o vídeo estiver rodando, ele lê o vídeo
 if video.isOpened(): 
     rval, frame = video.read()
 #Se o vídeo não estiver rodando, o script para
 else:
     rval = False
-
+#Enquanto o vídeo estiver rodando, ele continua exacutando o script
 while rval:
 
     #Converte a imagem para RGB
@@ -89,6 +106,7 @@ while rval:
     #Desenha o contorno das mãos
     desenho_contornos = desenha_contorno(rgb, contornos)
 
+    #Identifica a posição dos jogadores na tela
     jogador1, jogador2 = identifica_jogador(contornos)
 
     #Calcula a area de contorno do primeiro jogador
@@ -96,17 +114,17 @@ while rval:
     #Calcula a area de contorno do segundo jogador
     area_2 = acha_area_contorno(jogador2)
 
-    print(identifica_movimento(area_1))
     #Identifica o movimento do primeiro jogador
     movimento_1 = identifica_movimento(area_1)
     #Identifica o movimento do segundo jogador
     movimento_2 = identifica_movimento(area_2)
 
-
+    resultado = identifica_vitoria(movimento_1,movimento_2)
 
     #Imprime os movimentos realizado na tela
-    ala = exibe_texto(movimento_1+' x '+movimento_2)
-
+    ala = exibe_texto(movimento_1+' x '+movimento_2, 50)
+    #Imprime o resultado da partida na tela
+    ala = exibe_texto(resultado, 150)
     #Exibe a imagem scriptada.
     cv2.imshow("checkpoint", ala)
 
