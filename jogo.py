@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-# cor padrão para desenhos e textos.
+#Cor padrão para desenhos e textos.
 roxinho = (115, 50, 168)
 
 #Converte a imagem para RGB
@@ -18,12 +18,12 @@ def achar_cores(hsv):
     mask_hsv_amarelo = cv2.inRange(hsv, np.array([0, 30, 0]), np.array([255, 255, 255]))
     return cv2.bitwise_or(mask_hsv_amarelo, mask_hsv_rosa)
 
-#define os contornos da imagem
+#Define os contornos da imagem
 def acha_contorno(hsv):
     contornos, _ = cv2.findContours(achar_cores(hsv), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     return sorted(contornos, key=cv2.contourArea, reverse= True)
 
-#retorna o valor numérico da área do contorno
+#Retorna o valor numérico da área do contorno
 def acha_area_contorno(contorno):
     return cv2.contourArea(contorno)
 
@@ -32,7 +32,7 @@ def desenha_contorno(rgb, contornos):
     contornos_img = rgb.copy()
     return cv2.drawContours(contornos_img, [contornos[0], contornos[1]], -1, roxinho, 5)
 
-#identifica o tipo movimento
+#Identifica o tipo movimento
 def identifica_movimento(area):
     if(50000 < area < 52000):
         return 'Pedra'
@@ -45,7 +45,7 @@ def identifica_movimento(area):
 def exibe_texto(txt):
     return cv2.putText(desenho_contornos, str(txt),(50,50), cv2.FONT_HERSHEY_SIMPLEX,1, roxinho,2,cv2.LINE_AA)
 
-#identifica o jogador ganhador
+#Identifica o jogador ganhador
 #def identifica_vitoria:
 
 #Cria uma janela onde o vídeo irá rodar.
