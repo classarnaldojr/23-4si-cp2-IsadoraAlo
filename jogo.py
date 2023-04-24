@@ -45,6 +45,24 @@ def identifica_movimento(area):
 def exibe_texto(txt):
     return cv2.putText(desenho_contornos, str(txt),(50,50), cv2.FONT_HERSHEY_SIMPLEX,1, roxinho,2,cv2.LINE_AA)
 
+#Calcula o centro de massa do objeto.
+def centro_do_objeto(contorno):
+    M = cv2.moments(contorno)
+    cx = int(M['m10']/M['m00'])
+    cy = int(M['m01']/M['m00'])
+    
+    return cx + cy
+
+#Identifica a posição do jogador
+def identifica_jogador(contornos):
+    if (centro_do_objeto(contornos[0]) < centro_do_objeto(contornos[1])):
+        jogador1 = contornos[0]
+        jogador2 = contornos[1]
+    else:
+        jogador1 = contornos[1]
+        jogador2 = contornos[0]        
+    return jogador1, jogador2
+
 #Identifica o jogador ganhador
 #def identifica_vitoria:
 
@@ -71,16 +89,20 @@ while rval:
     #Desenha o contorno das mãos
     desenho_contornos = desenha_contorno(rgb, contornos)
 
+    jogador1, jogador2 = identifica_jogador(contornos)
+
     #Calcula a area de contorno do primeiro jogador
-    area_1 = acha_area_contorno(contornos[0])
+    area_1 = acha_area_contorno(jogador1)
     #Calcula a area de contorno do segundo jogador
-    area_2 = acha_area_contorno(contornos[1])
+    area_2 = acha_area_contorno(jogador2)
 
     print(identifica_movimento(area_1))
     #Identifica o movimento do primeiro jogador
     movimento_1 = identifica_movimento(area_1)
     #Identifica o movimento do segundo jogador
     movimento_2 = identifica_movimento(area_2)
+
+
 
     #Imprime os movimentos realizado na tela
     ala = exibe_texto(movimento_1+' x '+movimento_2)
